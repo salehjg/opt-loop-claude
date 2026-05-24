@@ -1,0 +1,31 @@
+// examples/screenshot — task description (hyperparameter tuning). Only the
+// task; the measurement (run train.py + screenshot plot.html) and the loop
+// mechanics are injected by claude_opt.py.
+{
+  "title": "Tune Gradient-Descent Hyperparameters to Converge Faster",
+
+  "objective": "Edit hyperparams.py so the optimizer in train.py reaches the target loss (1e-8) in as FEW iterations as possible, without diverging. Fewer iterations to convergence is strictly better.",
+
+  "problem": "train.py minimizes f(w) = 0.5*(w0^2 + 100*w1^2) starting at w=[1,1] using heavy-ball momentum (v = momentum*v - lr*grad; w += v). The problem is ill-conditioned (condition number 100): the w1 axis is 100x steeper than w0.",
+
+  "targets":      ["LEARNING_RATE, MOMENTUM, NUM_ITERS in hyperparams.py"],
+  "do_not_touch": ["train.py (the optimizer + plot generator)"],
+
+  "correctness": "A run is valid only if it CONVERGED (the plot header says 'CONVERGED at iteration N'). DIVERGED or DID NOT CONVERGE is a failure — revert.",
+
+  "how_to_read_the_plot": [
+    "The measurement screenshots plot.html: a log-scale loss-vs-iteration curve.",
+    "A curve that shoots UP / turns red = DIVERGED -> the learning rate is too high.",
+    "A nearly flat, slowly-declining curve = learning rate too low (slow).",
+    "A smooth, steep drop reaching the cyan dashed target line = good; note the iteration it crosses.",
+    "The header shows current lr/momentum and CONVERGED at N / DID NOT CONVERGE / DIVERGED.",
+  ],
+
+  "guidance": [
+    "Stability without momentum needs lr < 0.02 (the w1 curvature is 100).",
+    "Momentum (e.g. 0.6-0.9) accelerates the slow w0 direction dramatically — the big wins are here.",
+    "Too much momentum overshoots and is slower again; there is a sweet spot.",
+    "Make ONE change per iteration, measure, keep it only if iters-to-converge improved.",
+    "NUM_ITERS only needs to be large enough to show convergence; the score is the iteration the curve crosses the target.",
+  ],
+}

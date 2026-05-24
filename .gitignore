@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime outputs from the root config template (results_dir / history_file).
+# Rename to match your own paths if you change them. Each example has its own
+# .gitignore for its outputs.
+opt_runs/
+
+# Claude Code
+.claude/

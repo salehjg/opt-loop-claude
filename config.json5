@@ -1,0 +1,59 @@
+// ===========================================================================
+// config.json5 — settings for claude_opt.py
+//
+// Drop claude_opt.py + config.json5 + plan.json5 into any project and run:
+//   python claude_opt.py validate    # check this file
+//   python claude_opt.py run          # start the loop (optimizes in place)
+//   python claude_opt.py fetch        # measure once (what Claude calls)
+//
+// EVERY path below is yours to set — nothing is hardcoded. All keys are
+// REQUIRED (validate_config checks them). Paths are relative to where you
+// launch from; absolute paths work too. Comments + trailing commas are fine.
+// ===========================================================================
+{
+  // ── Claude model ─────────────────────────────────────────────────────────
+  "model": "opus",                 // alias ("opus"/"sonnet"/"haiku") or full id
+  "effort": "high",                // low | medium | high | xhigh | max
+  "permission_mode": "bypassPermissions",  // default|acceptEdits|auto|bypassPermissions|dontAsk|plan
+  "allowed_tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch"],
+
+  // ── Task description (hierarchical JSON5) ────────────────────────────────
+  "plan_file": "./plan.json5",
+
+  // ── Where Claude works: your project, edited IN PLACE (its cwd) ──────────
+  "project_dir": ".",
+
+  // ── Where the loop writes its outputs (YOU choose these paths) ───────────
+  "results_dir":  "./opt_runs",            // dated measurement reports live here
+  "history_file": "./opt_runs/history.md", // the optimization history Claude reads
+  "stderr_log_file": "./opt_runs/orchestrator.log",  // python log mirror; null = stderr only
+
+  // ── Loop timing ───────────────────────────────────────────────────────────
+  "infinite_loop_delay": 5,        // seconds between Claude relaunches
+  "opt_loop_delay": 0,             // min seconds enforced between `fetch` measurements
+
+  // ── Rate-limit / budget ─────────────────────────────────────────────────
+  "rate_limit_base_wait": 60,
+  "rate_limit_max_wait": 3600,
+  "max_budget_per_launch": null,   // USD cap per claude invocation, or null
+
+  // ── Measurement (how Claude scores a change) ─────────────────────────────
+  // mode "command":    runs a shell command in project_dir; its stdout is the
+  //                    result (timed, so the test duration is recorded).
+  // mode "screenshot": optional pre_command, then Playwright captures a URL
+  //                    into screenshot_dir with incremental names.
+  //                    Needs: pip install playwright && playwright install chromium
+  // mode "none":       no automated measurement.
+  "result_fetch": {
+    "mode": "command",
+    "command": "make bench",       // <-- your build/run command (mode "command")
+
+    // -- screenshot mode fields (used when mode == "screenshot") --
+    // "pre_command": "python train.py",   // optional: regenerate the page first
+    // "url": "plot.html",                 // full URL, or path resolved vs project_dir -> file://
+    // "screenshot_dir": "./opt_runs/screenshots",
+    // "viewport": [960, 560],
+    // "wait_ms": 500,
+    // "full_page": true,
+  },
+}

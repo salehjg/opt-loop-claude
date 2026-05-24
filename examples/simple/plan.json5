@@ -1,0 +1,36 @@
+// examples/simple — task description (matmul). Only the task; the measurement
+// command and the loop mechanics are injected by claude_opt.py.
+{
+  "title": "Matrix Multiplication Optimization",
+
+  "objective": "Minimize 'opt_ms' (the runtime of optimized_matmul) reported by the benchmark, for a dense 512x512 matmul C = A*B, while staying correct.",
+
+  "targets":      ["optimized_matmul() in matmul.cpp — this function only"],
+  "do_not_touch": ["gold_matmul() in matmul.cpp (the reference)", "main()/harness in matmul.cpp"],
+
+  "correctness": "The benchmark recomputes the result with gold_matmul and compares matrices; a change is correct only when it prints 'correct:  yes' (rel_err < 1e-6). Revert anything that prints 'correct:  no'.",
+
+  "constraints": [
+    "N = 512 (hardcoded).",
+    "Compiler: g++ -O3 -std=c++17 -march=native -fopenmp (already in the measurement command).",
+    "No external libraries (no BLAS, Eigen, MKL) — standard library + compiler intrinsics only.",
+    "Do not change the program's printed output format (gold_ms / opt_ms / speedup / rel_err / correct).",
+    "Edit only optimized_matmul; you may add helper functions/#includes it needs, but never change gold_matmul.",
+  ],
+
+  "ideas": [
+    "Loop reorder (i-k-j) so the inner loop is contiguous.",
+    "Transpose B once up front.",
+    "Cache blocking / tiling (e.g. 64x64 tiles).",
+    "SIMD intrinsics (<immintrin.h>, AVX2/FMA).",
+    "OpenMP: #pragma omp parallel for on the outer loop.",
+    "Register blocking + __builtin_prefetch + aligned allocation.",
+    "Combine several of the above for the biggest wins.",
+  ],
+
+  "rules_of_thumb": [
+    "One or two ideas per iteration; measure after every change.",
+    "Keep a change only if 'correct: yes' AND opt_ms dropped; otherwise revert.",
+    "Read the history log first so you don't repeat ideas already recorded as failures.",
+  ],
+}

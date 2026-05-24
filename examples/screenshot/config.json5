@@ -1,0 +1,44 @@
+// examples/screenshot — hyperparameter tuning, in place, SCREENSHOT-mode.
+//
+// Run from this directory (claude_opt.py is a symlink to the library):
+//   python claude_opt.py validate     # check config
+//   python claude_opt.py run           # start the loop
+//   python claude_opt.py fetch         # regenerate plot + screenshot it
+//
+// Requires Playwright for the screenshot:
+//   pip install playwright && playwright install chromium
+{
+  "model": "sonnet",
+  "effort": "high",
+  "permission_mode": "bypassPermissions",
+  "allowed_tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+
+  "plan_file": "./plan.json5",
+
+  // Claude works right here and edits hyperparams.py in place.
+  "project_dir": ".",
+
+  "results_dir":  "./opt_runs",
+  "history_file": "./opt_runs/history.md",
+  "stderr_log_file": "./opt_runs/orchestrator.log",
+
+  "infinite_loop_delay": 5,
+  "opt_loop_delay": 3,             // small cooldown between screenshot measurements
+
+  "rate_limit_base_wait": 60,
+  "rate_limit_max_wait": 3600,
+  "max_budget_per_launch": null,
+
+  "result_fetch": {
+    "mode": "screenshot",
+    // pre_command regenerates the plot from the current hyperparams, then the
+    // screenshot captures it — one fetch = run + measure.
+    "pre_command": "python train.py",
+    // url has no scheme → resolved to file://<project_dir>/plot.html (portable).
+    "url": "plot.html",
+    "screenshot_dir": "./opt_runs/screenshots",
+    "viewport": [960, 560],
+    "wait_ms": 500,
+    "full_page": true,
+  },
+}

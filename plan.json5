@@ -1,0 +1,30 @@
+// ===========================================================================
+// plan.json5 — the task Claude works from.
+//
+// Write ONLY the task: what to optimize, what NOT to touch, what "correct"
+// means, the goal metric, and ideas. You do NOT describe how to measure or how
+// the loop works — claude_opt.py injects the measurement command (from
+// result_fetch in config.json5) and the loop mechanics (never stop, only edit
+// the named targets, record every test in the history log, how to resume).
+//
+// Structure is free-form: every key/value is rendered into a readable outline.
+// `title` is special-cased as the heading.
+// ===========================================================================
+{
+  "title": "<short task title>",
+
+  "objective": "<the single metric to minimize/maximize, e.g. 'minimize runtime of foo() reported by the benchmark'>",
+
+  "targets": ["<the file(s) / function(s) Claude may edit, e.g. src/foo.cpp>"],
+  "do_not_touch": ["<reference code / tests that must stay unchanged>"],
+
+  "correctness": "<how a change is judged correct, e.g. 'the benchmark prints correct: yes'>",
+
+  "constraints": [
+    "<hard limits: language, libraries allowed, output format that must not change, etc.>",
+  ],
+
+  "ideas": [
+    "<optional starter ideas Claude can try, one per line>",
+  ],
+}

@@ -1,0 +1,45 @@
+// examples/resnet_cifar10 — ResNet18/CIFAR-10 hyperparameter search, in place,
+// SCREENSHOT-mode measurement against a live Plotly web server.
+//
+// Run from this directory (claude_opt.py is a symlink to the library):
+//   python claude_opt.py validate     # check config
+//   python claude_opt.py run           # start the loop
+//   python claude_opt.py fetch         # train once + screenshot the dashboard
+//
+// Requires: torch, torchvision, plotly, and Playwright for the screenshot:
+//   pip install torch torchvision plotly playwright && playwright install chromium
+{
+  "model": "sonnet",
+  "effort": "high",
+  "permission_mode": "bypassPermissions",
+  "allowed_tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+
+  "plan_file": "./plan.json5",
+
+  // Claude works here and edits hyperparams.json5 in place.
+  "project_dir": ".",
+
+  "results_dir":  "./opt_runs",
+  "history_file": "./opt_runs/history.md",
+  "stderr_log_file": "./opt_runs/orchestrator.log",
+
+  "infinite_loop_delay": 5,
+  "opt_loop_delay": 0,             // training is the bottleneck; no cooldown
+
+  "rate_limit_base_wait": 60,
+  "rate_limit_max_wait": 3600,
+  "max_budget_per_launch": null,
+
+  "result_fetch": {
+    "mode": "screenshot",
+    // Ensure the Plotly web server is up (it exits harmlessly if already
+    // running), then train with the current hyperparams.json5. train.py writes
+    // metrics.json + plot.html live each epoch; the server serves plot.html.
+    "pre_command": "(nohup python dashboard.py >/dev/null 2>&1 &) ; sleep 1 ; python train.py",
+    "url": "http://127.0.0.1:8050",
+    "screenshot_dir": "./opt_runs/screenshots",
+    "viewport": [1280, 720],
+    "wait_ms": 1500,
+    "full_page": true,
+  },
+}

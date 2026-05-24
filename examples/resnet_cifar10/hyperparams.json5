@@ -1,0 +1,17 @@
+// ResNet18 / CIFAR-10 training hyperparameters — THIS IS YOUR TARGET.
+// Tune these to reach the highest TEST accuracy in the least wall-clock time.
+// train.py reads this file and retrains from scratch on every measurement.
+{
+  "optimizer":     "sgd",        // "sgd" | "adam" | "adamw"
+  "learning_rate": 0.01,         // peak / base learning rate
+  "momentum":      0.9,          // sgd only
+  "weight_decay":  0.0005,
+  "nesterov":      false,
+
+  "lr_schedule":   "constant",   // "constant" | "step" | "cosine"
+  "init":          "default",    // "default" | "kaiming" | "xavier"
+
+  "batch_size":    128,
+  "epochs":        15,
+  "seed":          0,
+}

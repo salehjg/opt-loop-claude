@@ -1,0 +1,34 @@
+// examples/simple — matmul optimization, in place, COMMAND-mode measurement.
+//
+// Run from this directory (claude_opt.py is a symlink to the library):
+//   python claude_opt.py validate    # check config
+//   python claude_opt.py run          # start the loop
+//   python claude_opt.py fetch        # measure once (what Claude calls)
+{
+  "model": "sonnet",
+  "effort": "high",
+  "permission_mode": "bypassPermissions",
+  "allowed_tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+
+  "plan_file": "./plan.json5",
+
+  // Claude works right here and edits matmul.cpp in place.
+  "project_dir": ".",
+
+  "results_dir":  "./opt_runs",
+  "history_file": "./opt_runs/history.md",
+  "stderr_log_file": "./opt_runs/orchestrator.log",
+
+  "infinite_loop_delay": 5,
+  "opt_loop_delay": 0,             // build+run is cheap; no cooldown needed
+
+  "rate_limit_base_wait": 60,
+  "rate_limit_max_wait": 3600,
+  "max_budget_per_launch": null,
+
+  "result_fetch": {
+    "mode": "command",
+    // Compiles + runs matmul.cpp; the binary prints speedup + correct.
+    "command": "g++ -O3 -std=c++17 -march=native -fopenmp matmul.cpp -o /tmp/matmul_bench && /tmp/matmul_bench",
+  },
+}

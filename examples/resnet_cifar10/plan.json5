@@ -1,0 +1,31 @@
+// examples/resnet_cifar10 — task description. Only the task; the measurement
+// (start dashboard + train + screenshot) and loop mechanics are injected by
+// claude_opt.py.
+{
+  "title": "ResNet18 / CIFAR-10 — Find the Fastest Path to High Test Accuracy",
+
+  "objective": "Edit hyperparams.json5 so training reaches the HIGHEST test accuracy in the LEAST wall-clock time. The benchmark prints best_test_acc and total_seconds; favour configs that improve accuracy and, among similar accuracies, train faster.",
+
+  "targets":      ["hyperparams.json5 (optimizer, learning_rate, momentum, weight_decay, nesterov, lr_schedule, init, batch_size, epochs, seed)"],
+  "do_not_touch": ["train.py (model + training loop + plotting)", "dashboard.py (web server)"],
+
+  "correctness": "A run is valid only if training completes and prints best_test_acc with no NaN/divergence in the curves. If loss goes to NaN or accuracy collapses, the learning rate is too high — revert.",
+
+  "how_to_read_the_plot": [
+    "The screenshot is a live Plotly dashboard with two panels: Loss and Accuracy (%).",
+    "Each panel has three curves: train (blue), val (green), test (red).",
+    "Accuracy curves that climb high and fast = good; flat/low = lr too low or too few epochs.",
+    "Loss spiking up or NaN = lr too high / unstable.",
+    "A large gap between train and val/test accuracy = overfitting → raise weight_decay.",
+    "The title shows current hyperparameters, best test acc, and total seconds.",
+  ],
+
+  "guidance": [
+    "A strong CIFAR-10 ResNet18 baseline: SGD, lr=0.1, momentum=0.9, weight_decay=5e-4, lr_schedule=cosine, init=kaiming.",
+    "Tune EPOCHS for the accuracy/time tradeoff — more epochs help accuracy but cost time; find the knee.",
+    "If you raise batch_size, scale learning_rate up roughly proportionally.",
+    "cosine schedule usually beats constant; step is a simpler decay.",
+    "adam/adamw need much smaller lr (~1e-3) than sgd.",
+    "Change ONE thing per iteration, measure, and keep it only if best_test_acc improved (or matched it in less time). Record total_seconds every time.",
+  ],
+}

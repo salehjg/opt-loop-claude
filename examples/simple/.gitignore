@@ -1,0 +1,6 @@
+# Runtime outputs (results_dir / history_file in config.json5)
+opt_runs/
+
+__pycache__/
+*.pyc
+*.pyo
